@@ -1,35 +1,50 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./assets/style/style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat&family=Patrick+Hand&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/style/style.css" />
     <title>BudgetMate</title>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>BudgetMate</h1>
-        <nav>
-            <ul>
-                <li><a href="./infos.html" target="_blank" rel="noopener noreferrer">Qui suis-je ?</a> </li>
-                <li><a href="./contact.html" target="_blank" rel="noopener noreferrer">Contact</a> </li>
-            </ul>
-        </nav>
+      <h1>BudgetMate</h1>
+      <nav>
+        <ul>
+          <li>
+            <a href="./infos.html" target="_blank" rel="noopener noreferrer">Qui suis-je ?</a>
+          </li>
+          <li><a href="./contact.html" target="_blank" rel="noopener noreferrer">Contact</a></li>
+        </ul>
+      </nav>
     </header>
     <main>
-        <section id="entrees">
-            <h2>Entrées :</h2>
-            <div id="listEntry">
-
-                
-            </div>
-            <form action=""></form>
-            <button id="addE">Ajouter une entrée d'argent</button>
-            <button id="validateE">Valider</button>
+      <div id="griffonSnippet">
+        <section id="snippetZone">
+          <div class="griffon-col" id="col-entrees">
+            <h3>Entrées</h3>
+          </div>
+          <div class="griffon-col" id="col-depenses">
+            <h3>Dépenses</h3>
+          </div>
         </section>
+        <div id="ligne-totale">Total : + 1090 €</div>
+      </div>
+      <section id="transactions">
+        <h2>Entrées :</h2>
+        <div id="listEntry"></div>
+        <form action=""></form>
+        <button id="addE">Ajouter une entrée d'argent</button>
+        <!-- <button id="validateE">Valider</button> -->
+        <div id="listSpending"></div>
+        <button id="addS">Ajouter une dépense d'argent</button>
+      </section>
     </main>
 
     <script type="module" src="./assets/js/scriptDom.js"></script>
-</body>
+  </body>
 </html>
