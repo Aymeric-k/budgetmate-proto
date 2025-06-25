@@ -23,7 +23,7 @@
       </nav>
     </header>
     <main>
-      <div id="griffonSnippet">
+      <div id="griffonSnippet" class="hidden">
         <section id="snippetZone">
           <div class="griffon-col" id="col-entrees">
             <h3>Entrées</h3>
@@ -32,17 +32,19 @@
             <h3>Dépenses</h3>
           </div>
         </section>
-        <div id="ligne-totale">Total : + 1090 €</div>
+        <div id="ligne-totale"></div>
       </div>
       <section id="transactions">
-        <h2>Entrées :</h2>
+        <h2 id="titreEntree">Entrées :</h2>
         <div id="listEntry"></div>
         <form action=""></form>
-        <button id="addE">Ajouter une entrée d'argent</button>
-        <!-- <button id="validateE">Valider</button> -->
+        <button id="addE" class="add">Ajouter une entrée d'argent</button>
+
+        <h2>Dépenses :</h2>
         <div id="listSpending"></div>
-        <button id="addS">Ajouter une dépense d'argent</button>
+        <button id="addS" class="add">Ajouter une dépense d'argent</button>
       </section>
+      <button id="toggleSnippet" class="mobile-only">👁️ Aperçu rapide</button>
     </main>
 
     <script type="module" src="./assets/js/scriptDom.js"></script>

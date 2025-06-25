@@ -47,7 +47,7 @@ function createFormInput(index, type, element) {
         <input type="checkbox" id="recurrence-${index}" name="recurrence">
       </fieldset>
       <fieldset id="frequenceContainer-${index}"></fieldset>
-      <button type="button">Ajouter</button>
+      <button type="button" class="add">Ajouter</button>
     </form>
     `
   const recurrenceCheckbox = document.querySelector(`#recurrence-${index}`)
@@ -96,6 +96,9 @@ function createFormInput(index, type, element) {
     const depenseTransactions = monPortefeuille.filtrerParType('depense')
     afficherDepense(depenseTransactions)
     afficherEntree(entreeTransactions)
+    const soldeDisponible = monPortefeuille.calculerSolde()
+    const ligneTotale = document.querySelector('#ligne-totale')
+    ligneTotale.textContent = `Solde : ${soldeDisponible} €`
   })
 }
 createFormInput(listEntryLength, 'entree', listEntry)
@@ -183,3 +186,34 @@ function updateGriffonColonne(type, montant) {
   ligne.textContent = `${type === 'entree' ? '+ ' : '- '}${montant} €`
   document.querySelector(`#col-${type === 'entree' ? 'entrees' : 'depenses'}`).appendChild(ligne)
 }
+
+// if (toggleBtn && snippetZone) {
+//   toggleBtn.addEventListener('click', () => {
+//     griffonSnippet.classList.toggle('open')
+//     toggleBtn.textContent = snippetZone.classList.contains('hidden')
+//       ? '👁️ Aperçu rapide'
+//       : '🙈 Cache'
+//   })
+// }
+const toggleBtn = document.getElementById('toggleSnippet')
+const snippet = document.getElementById('griffonSnippet')
+
+toggleBtn.addEventListener('click', () => {
+  if (snippet.classList.contains('open')) {
+    document.body.style.overflow = 'hidden'
+    snippet.classList.add('closing')
+    snippet.style.pointerEvents = 'none'
+    setTimeout(() => {
+      snippet.classList.remove('open', 'closing')
+      snippet.style.pointerEvents = ''
+    }, 300)
+    toggleBtn.textContent = '👁️ Aperçu rapide'
+  } else {
+    snippet.classList.add('open')
+    toggleBtn.textContent = '🙈 Cache'
+    document.body.style.overflow = ''
+  }
+  if (snippet.classList.contains('open')) {
+  } else {
+  }
+})
