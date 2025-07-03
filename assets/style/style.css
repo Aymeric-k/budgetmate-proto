@@ -4,8 +4,7 @@ body {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
   margin: 0;
 }
-html,
-body {
+fieldset {
   overflow-x: hidden;
 }
 
@@ -59,6 +58,7 @@ h2 {
 h3 {
   text-align: center;
 }
+
 main {
   height: 100%;
   width: 100%;
@@ -115,7 +115,7 @@ section input {
 
 form,
 fieldset {
-  width: 100%;
+  width: 95%;
   display: flex;
 }
 form {
@@ -221,14 +221,18 @@ section input::placeholder {
   padding-bottom: 1rem;
   margin: 0;
 }
-
+#datePicker {
+  background-color: transparent;
+  border: none;
+  width: 28px;
+}
 .griffon-col {
   display: flex;
   flex-direction: column;
   /* gap: 0.3rem; */
   font-family: 'Patrick Hand', cursive;
   font-size: 1.2rem;
-  min-width: 100px;
+  min-width: 150px;
 }
 .griffon-col:nth-child(2) {
   border-left: 2px solid #999;
@@ -273,7 +277,36 @@ section input::placeholder {
   display: none;
 }
 
+#totalBox button svg {
+  stroke: black;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+#totalBox {
+  position: sticky;
+  top: 0;
+  width: 20vw;
+  margin-left: auto;
+  background-color: #f0e4b0;
+  border: 2px solid black;
+  padding: 0.6rem 1.2rem;
+  border-bottom-left-radius: 0.6rem;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  z-index: 20;
+}
 @media screen and (max-width: 899px) {
+  #totalBox button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
   .griffon-col {
     font-size: 30px;
     padding-right: 10px;
@@ -317,13 +350,20 @@ section input::placeholder {
   #toggleSnippet {
     display: block;
   }
+  #snippetZone {
+    height: 100%;
+  }
+  #ligne-totale {
+    font-size: larger;
+    padding-left: 0;
+  }
 }
 @media screen and (min-width: 900px) {
   #griffonSnippet {
-    display: block !important;
+    display: block;
     position: absolute;
   }
-  #listEntry {
-    /* margin-top: 4rem; */
+  #griffon-date {
+    font-size: 12px;
   }
 }

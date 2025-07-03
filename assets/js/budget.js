@@ -7,7 +7,7 @@ class Transaction {
   }
 
   getDateFormatee() {
-    return this.date.toLocaleDateString('fr')
+    return this.date.toLocaleDateString('fr', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 }
 
@@ -15,6 +15,9 @@ class Transaction {
 class BudgetManager {
   constructor() {
     this.transactions = []
+  }
+  initialiserTransactions(transactions) {
+    this.transactions = transactions
   }
   ajouterTransaction(transaction) {
     this.transactions.push(transaction)
@@ -30,6 +33,20 @@ class BudgetManager {
   }
   filtrerParType(type) {
     return this.transactions.filter((transaction) => transaction.type === type)
+  }
+  calculerSoldeALaDate(date) {
+    let solde = 0
+    const dateReference = new Date(date) // Convertit la date en objet Date pour comparaison
+
+    this.transactions.forEach((transaction) => {
+      // Inclure seulement les transactions avant ou à la date de référence
+      if (transaction.date <= dateReference) {
+        transaction.type === 'entree'
+          ? (solde += transaction.montant)
+          : (solde -= transaction.montant)
+      }
+    })
+    return solde
   }
 }
 

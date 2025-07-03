@@ -3,24 +3,13 @@ import { Transaction, BudgetManager } from './budget.js'
 const entrees = document.querySelector('#entrees')
 const addE = document.querySelector('#addE')
 const addS = document.querySelector('#addS')
-const validateE = document.querySelector('#validateE')
-const addElementForm = document.querySelector('#addElement')
+
 const listEntry = document.querySelector('#listEntry')
 const listSpending = document.querySelector('#listSpending')
-
+const soldeMontant = document.querySelector('#soldeMontant')
+const dateInput = document.querySelector('#datePicker')
 const monPortefeuille = new BudgetManager()
 
-const transactions = []
-
-// function transformInputIntoP(element,value, index){
-//     const p = document.createElement('p');
-//     p.dataset.index = index;
-//     p.classList.add('writing','entree');
-//     p.textContent= value;
-
-//     element.parentNode.replaceChild(p,element);
-
-// }
 let listEntryLength = listEntry.children.length
 let listSpendingLength = listSpending.children.length
 
@@ -90,15 +79,17 @@ function createFormInput(index, type, element) {
     transaction.statut = statut
 
     monPortefeuille.ajouterTransaction(transaction)
-    updateGriffonColonne(type, montant)
+    updateGriffonColonne(type, montant, date)
 
     const entreeTransactions = monPortefeuille.filtrerParType('entree')
     const depenseTransactions = monPortefeuille.filtrerParType('depense')
-    afficherDepense(depenseTransactions)
-    afficherEntree(entreeTransactions)
-    const soldeDisponible = monPortefeuille.calculerSolde()
+    afficherTransactions(entreeTransactions, listEntry)
+    afficherTransactions(depenseTransactions, listSpending)
+    const soldeDisponible = monPortefeuille.calculerSoldeALaDate(new Date())
+    const formattedDate = new Date().toLocaleDateString('fr-FR')
     const ligneTotale = document.querySelector('#ligne-totale')
-    ligneTotale.textContent = `Solde : ${soldeDisponible} €`
+    soldeMontant.textContent = `${soldeDisponible} € (Au ${formattedDate})`
+    ligneTotale.textContent = `Solde : ${soldeDisponible} € (Au ${formattedDate})`
   })
 }
 createFormInput(listEntryLength, 'entree', listEntry)
@@ -112,61 +103,23 @@ addS.addEventListener('click', () => {
 
 const newTransaction = document.querySelector('.transaction')
 
-// listEntry.addEventListener('keydown', (e) => {
-//   if (e.target.classList.contains('transaction') && e.key === 'Enter') {
-//     let addForm = e.target.closest('form')
-//     let dateTransaction = addForm.querySelector('[name="dateAction"]').value
-//     let statut = getStatutFromDate(dateTransaction)
-//     let nomTransaction = addForm.querySelector('#nom').value
-//     let montantTransaction = Number(addForm.querySelector('#montant').value)
-
-//     let type = document.querySelector('#montant').dataset.type
-//     let index = document.querySelector('#montant').dataset.index
-
-//     transactions[index] = new Transaction(nomTransaction, montantTransaction, type)
-//     transactions[index].statut = statut
-//     monPortefeuille.ajouterTransaction(transactions[index])
-//     let entreeTransactions = monPortefeuille.filtrerParType('entree')
-//     afficherEntree(entreeTransactions)
-//     addForm.reset()
-//   }
-// })
-
-const afficherEntree = (entrees) => {
-  listEntry.innerHTML = ''
-  entrees.forEach((entree) => {
-    let ligne = `<div class ="post-it entree">`
-    Object.keys(entree).forEach((key) => {
+function afficherTransactions(transactions, containerElement) {
+  containerElement.innerHTML = ''
+  transactions.forEach((transaction) => {
+    const postItClass = transaction.type === 'entree' ? 'entree' : 'depense'
+    let ligne = `<div class="post-it ${postItClass}">`
+    Object.keys(transaction).forEach((key) => {
       ligne += ` <p><span class="bold">${key}</span> : `
       if (key === 'date') {
-        ligne += ` ${entree.getDateFormatee()}  </p>`
+        ligne += ` ${transaction.getDateFormatee()}  </p>`
       } else if (key === 'statut') {
-        ligne += ` ${entree[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'} </p>`
+        ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'} </p>`
       } else {
-        ligne += ` ${entree[key]}</p>  `
+        ligne += ` ${transaction[key]}</p>  `
       }
     })
     ligne += `</div>`
-    listEntry.innerHTML += ligne
-  })
-}
-const afficherDepense = (depenses) => {
-  listSpending.innerHTML = ''
-
-  depenses.forEach((depense) => {
-    let ligne = `<div class= "post-it depense">`
-    Object.keys(depense).forEach((key) => {
-      ligne += ` <p><span class="bold">${key}</span> : `
-      if (key === 'date') {
-        ligne += ` ${depense.getDateFormatee()}  </p>`
-      } else if (key === 'statut') {
-        ligne += ` ${depense[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'} </p>`
-      } else {
-        ligne += ` ${depense[key]}</p>  `
-      }
-    })
-    ligne += `</div>`
-    listSpending.innerHTML += ligne
+    containerElement.innerHTML += ligne
   })
 }
 
@@ -174,46 +127,70 @@ function getStatutFromDate(dateString) {
   const today = new Date()
   const dateInput = new Date(dateString)
 
-  // On normalise les dates (sans l'heure)
   today.setHours(0, 0, 0, 0)
   dateInput.setHours(0, 0, 0, 0)
 
   return dateInput > today ? 'prévu' : 'réalisé'
 }
-function updateGriffonColonne(type, montant) {
+function updateGriffonColonne(type, montant, date) {
   const ligne = document.createElement('div')
   ligne.className = 'ligne-griffon'
-  ligne.textContent = `${type === 'entree' ? '+ ' : '- '}${montant} €`
+  ligne.innerHTML = `<p>${
+    type === 'entree' ? '+ ' : '- '
+  }${montant} € <span id ="griffon-date">(${date})</span></p>`
   document.querySelector(`#col-${type === 'entree' ? 'entrees' : 'depenses'}`).appendChild(ligne)
 }
 
-// if (toggleBtn && snippetZone) {
-//   toggleBtn.addEventListener('click', () => {
-//     griffonSnippet.classList.toggle('open')
-//     toggleBtn.textContent = snippetZone.classList.contains('hidden')
-//       ? '👁️ Aperçu rapide'
-//       : '🙈 Cache'
-//   })
-// }
 const toggleBtn = document.getElementById('toggleSnippet')
 const snippet = document.getElementById('griffonSnippet')
 
 toggleBtn.addEventListener('click', () => {
   if (snippet.classList.contains('open')) {
-    document.body.style.overflow = 'hidden'
     snippet.classList.add('closing')
     snippet.style.pointerEvents = 'none'
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
     setTimeout(() => {
       snippet.classList.remove('open', 'closing')
       snippet.style.pointerEvents = ''
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }, 300)
     toggleBtn.textContent = '👁️ Aperçu rapide'
   } else {
     snippet.classList.add('open')
     toggleBtn.textContent = '🙈 Cache'
-    document.body.style.overflow = ''
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
   }
-  if (snippet.classList.contains('open')) {
+})
+
+dateInput.addEventListener('change', () => {
+  const selectedDate = dateInput.value
+  const ligneTotale = document.querySelector('#ligne-totale')
+
+  // Si la date est effacée, on revient au solde du jour
+  if (!selectedDate) {
+    const soldeActuel = monPortefeuille.calculerSoldeALaDate(new Date())
+    soldeMontant.textContent = `${soldeActuel} €`
+    if (ligneTotale) {
+      ligneTotale.textContent = `Solde : ${soldeActuel} €`
+    }
+    return
+  }
+
+  const soldeALaDate = monPortefeuille.calculerSoldeALaDate(selectedDate)
+  const today = new Date()
+  const selectedDateObj = new Date(selectedDate)
+  today.setHours(0, 0, 0, 0)
+  selectedDateObj.setHours(0, 0, 0, 0)
+
+  if (selectedDateObj > today) {
+    const formattedDate = selectedDateObj.toLocaleDateString('fr-FR')
+    soldeMontant.textContent = `${soldeALaDate} € (Prévision au ${formattedDate})`
+    ligneTotale.textContent = `Solde (prévision) : ${soldeALaDate} €`
   } else {
+    soldeMontant.textContent = `${soldeALaDate} €`
+    ligneTotale.textContent = `Solde : ${soldeALaDate} €`
   }
 })
