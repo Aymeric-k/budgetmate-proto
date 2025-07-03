@@ -10,6 +10,10 @@ const soldeMontant = document.querySelector('#soldeMontant')
 const dateInput = document.querySelector('#datePicker')
 const monPortefeuille = new BudgetManager()
 
+function saveTransactionsToLocalStorage() {
+  localStorage.setItem('transactions', JSON.stringify(monPortefeuille.transactions))
+}
+
 let listEntryLength = listEntry.children.length
 let listSpendingLength = listSpending.children.length
 
@@ -105,23 +109,69 @@ const newTransaction = document.querySelector('.transaction')
 
 function afficherTransactions(transactions, containerElement) {
   containerElement.innerHTML = ''
-  transactions.forEach((transaction) => {
+  const fragment = document.createDocumentFragment()
+  transactions.forEach((transaction, index) => {
+    const postItDiv = document.createElement('div')
     const postItClass = transaction.type === 'entree' ? 'entree' : 'depense'
-    let ligne = `<div class="post-it ${postItClass}">`
+    postItDiv.className = `post-it ${postItClass}`
+    const btnContainer = document.createElement('div')
+    btnContainer.className = 'btn-container'
+    postItDiv.appendChild(btnContainer)
+    const editBtn = document.createElement('button')
+    editBtn.className = 'edit-btn post-it-btn'
+    editBtn.textContent = '✏️'
+    editBtn.dataset.index = index
+    btnContainer.appendChild(editBtn)
+
+    const deleteBtn = document.createElement('button')
+    deleteBtn.className = 'delete-btn post-it-btn'
+    deleteBtn.textContent = '🗑️'
+    deleteBtn.dataset.index = index
+    btnContainer.appendChild(deleteBtn)
     Object.keys(transaction).forEach((key) => {
-      ligne += ` <p><span class="bold">${key}</span> : `
+      const p = document.createElement('p')
+      const boldSpan = document.createElement('span')
+      boldSpan.className = 'bold'
+      boldSpan.textContent = `${key}`
+      p.appendChild(boldSpan)
+
+      let ligne = `:`
+
       if (key === 'date') {
-        ligne += ` ${transaction.getDateFormatee()}  </p>`
+        ligne += ` ${transaction.getDateFormatee()}`
       } else if (key === 'statut') {
-        ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'} </p>`
+        ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'}`
       } else {
-        ligne += ` ${transaction[key]}</p>  `
+        ligne += ` ${transaction[key]}`
       }
+      p.appendChild(document.createTextNode(ligne))
+      postItDiv.appendChild(p)
     })
-    ligne += `</div>`
-    containerElement.innerHTML += ligne
+    fragment.appendChild(postItDiv)
   })
+  containerElement.appendChild(fragment)
 }
+
+// transactions.forEach((transaction) => {
+//   const postItClass = transaction.type === 'entree' ? 'entree' : 'depense'
+//   let ligne = `<div class="post-it ${postItClass}"><button class ="edit-btn" data-index="${transactions.indexOf(
+//     transaction
+//   )}">✏️</button><button class ="delete-btn" data-index="${transactions.indexOf(
+//     transaction
+//   )}">🗑️</button>`
+//   Object.keys(transaction).forEach((key) => {
+//     ligne += ` <p><span class="bold">${key}</span> : `
+//     if (key === 'date') {
+//       ligne += ` ${transaction.getDateFormatee()}  </p>`
+//     } else if (key === 'statut') {
+//       ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'} </p>`
+//     } else {
+//       ligne += ` ${transaction[key]}</p>  `
+//     }
+//   })
+//   ligne += `</div>`
+//   containerElement.innerHTML += ligne
+// })
 
 function getStatutFromDate(dateString) {
   const today = new Date()
