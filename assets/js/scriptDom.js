@@ -37,7 +37,7 @@ function createFormInput(index, type, element) {
       </fieldset>
       <fieldset>
         <label for="recurrence">Récurrent ?</label>
-        <input type="checkbox" id="recurrence-${index}" name="recurrence">
+        <input type="checkbox" id="recurrence-${index}" name="recurrence" value="non">
       </fieldset>
       <fieldset id="frequenceContainer-${index}"></fieldset>
       <button type="button" class="add">Ajouter</button>
@@ -94,6 +94,7 @@ function createFormInput(index, type, element) {
     const ligneTotale = document.querySelector('#ligne-totale')
     soldeMontant.textContent = `${soldeDisponible} € (Au ${formattedDate})`
     ligneTotale.textContent = `Solde : ${soldeDisponible} € (Au ${formattedDate})`
+    updateUI()
   })
 }
 createFormInput(listEntryLength, 'entree', listEntry)
@@ -105,7 +106,18 @@ addS.addEventListener('click', () => {
   createFormInput(listSpendingLength, 'depense', listSpending)
 })
 
-const newTransaction = document.querySelector('.transaction')
+function updateUI() {
+  const entreeTransactions = monPortefeuille.filtrerParType('entree')
+  const depenseTransactions = monPortefeuille.filtrerParType('depense')
+  afficherTransactions(entreeTransactions, listEntry)
+  afficherTransactions(depenseTransactions, listSpending)
+
+  const soldeDisponible = monPortefeuille.calculerSoldeALaDate(new Date())
+  const formattedDate = new Date().toLocaleDateString('fr-FR')
+  const ligneTotale = document.querySelector('#ligne-totale')
+  soldeMontant.textContent = `${soldeDisponible} € (Au ${formattedDate})`
+  ligneTotale.textContent = `Solde : ${soldeDisponible} € (Au ${formattedDate})`
+}
 
 function afficherTransactions(transactions, containerElement) {
   containerElement.innerHTML = ''
@@ -117,61 +129,115 @@ function afficherTransactions(transactions, containerElement) {
     const btnContainer = document.createElement('div')
     btnContainer.className = 'btn-container'
     postItDiv.appendChild(btnContainer)
+    const globalIndex = monPortefeuille.transactions.indexOf(transaction)
     const editBtn = document.createElement('button')
     editBtn.className = 'edit-btn post-it-btn'
     editBtn.textContent = '✏️'
-    editBtn.dataset.index = index
+    editBtn.dataset.index = globalIndex
     btnContainer.appendChild(editBtn)
 
     const deleteBtn = document.createElement('button')
     deleteBtn.className = 'delete-btn post-it-btn'
     deleteBtn.textContent = '🗑️'
-    deleteBtn.dataset.index = index
+    deleteBtn.dataset.index = globalIndex
     btnContainer.appendChild(deleteBtn)
+    const proprietesACacher = ['recurrence']
+
     Object.keys(transaction).forEach((key) => {
-      const p = document.createElement('p')
-      const boldSpan = document.createElement('span')
-      boldSpan.className = 'bold'
-      boldSpan.textContent = `${key}`
-      p.appendChild(boldSpan)
+      if (!proprietesACacher.includes(key)) {
+        const p = document.createElement('p')
+        const boldSpan = document.createElement('span')
+        boldSpan.className = 'bold'
+        boldSpan.textContent = `${key}`
+        p.appendChild(boldSpan)
 
-      let ligne = `:`
+        let ligne = ` : `
 
-      if (key === 'date') {
-        ligne += ` ${transaction.getDateFormatee()}`
-      } else if (key === 'statut') {
-        ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'}`
-      } else {
-        ligne += ` ${transaction[key]}`
+        if (key === 'date') {
+          ligne += ` ${transaction.getDateFormatee()}`
+        } else if (key === 'statut') {
+          ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'}`
+        } else {
+          ligne += ` ${transaction[key]}`
+        }
+        p.appendChild(document.createTextNode(ligne))
+        postItDiv.appendChild(p)
       }
-      p.appendChild(document.createTextNode(ligne))
-      postItDiv.appendChild(p)
+      fragment.appendChild(postItDiv)
     })
-    fragment.appendChild(postItDiv)
+    containerElement.appendChild(fragment)
   })
-  containerElement.appendChild(fragment)
 }
+function handleListClick(e) {
+  if (e.target.classList.contains('delete-btn')) {
+    const index = e.target.dataset.index
 
-// transactions.forEach((transaction) => {
-//   const postItClass = transaction.type === 'entree' ? 'entree' : 'depense'
-//   let ligne = `<div class="post-it ${postItClass}"><button class ="edit-btn" data-index="${transactions.indexOf(
-//     transaction
-//   )}">✏️</button><button class ="delete-btn" data-index="${transactions.indexOf(
-//     transaction
-//   )}">🗑️</button>`
-//   Object.keys(transaction).forEach((key) => {
-//     ligne += ` <p><span class="bold">${key}</span> : `
-//     if (key === 'date') {
-//       ligne += ` ${transaction.getDateFormatee()}  </p>`
-//     } else if (key === 'statut') {
-//       ligne += ` ${transaction[key] === 'prévu' ? 'prévu ⏳' : 'réalisé ✅'} </p>`
-//     } else {
-//       ligne += ` ${transaction[key]}</p>  `
-//     }
-//   })
-//   ligne += `</div>`
-//   containerElement.innerHTML += ligne
-// })
+    if (!isNaN(index)) {
+      monPortefeuille.supprimerTransaction(index)
+      updateUI()
+    }
+  } else if (e.target.classList.contains('edit-btn')) {
+    const parentElement = e.target.closest('.post-it')
+    const index = e.target.dataset.index
+    const transaction = monPortefeuille.transactions[index]
+    const inputDateValue = formatDateForInput(transaction.date)
+
+    // parentElement.classList.remove('post-it', transaction.type)
+    parentElement.classList.add('edit')
+    parentElement.innerHTML = `
+
+      <input type="text" name="nom" id="nom-${index}" placeholder="Optionnel" data-index="${
+      index - 1
+    }" value = "${transaction.nom}">
+      <input type="number" name="montant" id="montant-${index}" placeholder="Montant exact" data-index="${index}" data-type="${
+      transaction.type
+    }" class="transaction" value = "${transaction.montant}">
+      <input type="date" name="dateAction" id="dateAction-${index}" value = "${inputDateValue}">
+      <fieldset>
+      <label for="recurrence">Récurrent ?</label>
+      <input type="checkbox" id="recurrence-${index}" name="recurrence" value="${
+      transaction.recurrence
+    }">
+    </fieldset>
+      <fieldset id="frequenceContainer-${index}"></fieldset>
+      <fieldset class="edit-buttons">
+        <button type="button" class="cancel-btn">❌</button>
+        <button type="button" class="save-btn">✔️</button>
+      </fieldset>
+    `
+    const cancelBtn = parentElement.querySelector('.cancel-btn')
+    cancelBtn.addEventListener('click', () => {
+      updateUI()
+    })
+    const saveBtn = parentElement.querySelector('.save-btn')
+    saveBtn.addEventListener('click', () => {
+      const nom = parentElement.querySelector(`#nom-${index}`).value.trim()
+      const montant = Number(parentElement.querySelector(`#montant-${index}`).value)
+      const date = parentElement.querySelector(`#dateAction-${index}`).value
+      const recurrence = parentElement.querySelector(`#recurrence-${index}`)
+      const datePourMAJ = new Date(date)
+
+      const nouvellesDonnes = {
+        nom: nom,
+        montant: montant,
+        date: datePourMAJ,
+        recurrence: recurrence,
+      }
+      monPortefeuille.modifierTransaction(index, nouvellesDonnes)
+      updateUI()
+    })
+  }
+}
+listEntry.addEventListener('click', handleListClick)
+listSpending.addEventListener('click', handleListClick)
+
+function formatDateForInput(date) {
+  if (!(date instanceof Date) || isNaN(date)) {
+    return ''
+  }
+
+  return date.toISOString().slice(0, 10)
+}
 
 function getStatutFromDate(dateString) {
   const today = new Date()

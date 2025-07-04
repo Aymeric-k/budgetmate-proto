@@ -1,8 +1,9 @@
 class Transaction {
-  constructor(nom, montant, type, date) {
+  constructor(nom, montant, type, date, recurrence) {
     this.nom = nom
     this.montant = montant
     this.type = type
+    this.recurrence = recurrence
     this.date = new Date(date)
   }
 
@@ -21,6 +22,15 @@ class BudgetManager {
   }
   ajouterTransaction(transaction) {
     this.transactions.push(transaction)
+  }
+  supprimerTransaction(index) {
+    this.transactions.splice(index, 1)
+  }
+  modifierTransaction(index, nouvellesDonnees) {
+    const transactionExistante = this.transactions[index]
+    if (transactionExistante) {
+      Object.assign(transactionExistante, nouvellesDonnees)
+    }
   }
   calculerSolde() {
     let solde = 0

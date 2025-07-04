@@ -67,14 +67,27 @@ main {
   background-color: #faf3dd;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-repeat: repeat;
-  padding-top: 1vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
-#entrees {
+main::before {
+  content: '';
+  width: 250px;
+  flex-shrink: 0;
+}
+#transactions {
   font-family: 'Caveat';
   max-width: 800px;
-  margin: auto;
   position: relative;
   padding: 2em;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  flex-shrink: 0;
 }
 fieldset {
   border: none;
@@ -131,7 +144,7 @@ fieldset {
 fieldset label {
   font-size: 20px;
   font-weight: 800;
-  width: 10%;
+  width: 18%;
   text-align: center;
 }
 
@@ -188,12 +201,7 @@ section input::placeholder {
   padding: 20px;
   font-size: 24px;
 }
-#transactions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1em;
-}
+
 .post-it::before {
   content: '';
   position: absolute;
@@ -220,6 +228,7 @@ section input::placeholder {
   border-bottom: 2px dashed #aaa;
   padding-bottom: 1rem;
   margin: 0;
+  width: max-content;
 }
 #datePicker {
   background-color: transparent;
@@ -249,7 +258,9 @@ section input::placeholder {
   padding-left: 1rem;
   min-width: 250px;
 }
-
+#ligne-totale p {
+  text-align: center;
+}
 #griffonSnippet {
   position: absolute;
   left: 1rem;
@@ -263,11 +274,11 @@ section input::placeholder {
 }
 #toggleSnippet {
   position: fixed;
-  bottom: 1rem;
-  right: 1rem;
+  bottom: 4rem;
+  right: 0;
   z-index: 1000;
   font-size: 1.1rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.6rem 0.8rem;
   border: 2px dashed #333;
   border-radius: 1rem;
   box-shadow: 2px 2px 0px #000;
@@ -283,8 +294,7 @@ section input::placeholder {
 #totalBox {
   position: sticky;
   top: 0;
-  width: 20vw;
-  margin-left: auto;
+  width: 250px;
   background-color: #f0e4b0;
   border: 2px solid black;
   padding: 0.6rem 1.2rem;
@@ -297,6 +307,7 @@ section input::placeholder {
   justify-content: center;
   gap: 0.8rem;
   z-index: 20;
+  flex-shrink: 1;
 }
 .btn-container {
   display: flex;
@@ -313,6 +324,22 @@ section input::placeholder {
   cursor: pointer;
 }
 @media screen and (max-width: 899px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 5rem;
+  }
+  #totalBox {
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    top: auto;
+    border-radius: 0;
+    border-top: 2px solid black;
+    border-bottom: none;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+  }
   #totalBox button {
     background: none;
     border: none;
@@ -377,5 +404,31 @@ section input::placeholder {
   }
   #griffon-date {
     font-size: 12px;
+  }
+  .edit input {
+    padding: 0;
+    margin: 0.5em 0;
+  }
+  .edit fieldset {
+    padding: 0;
+    overflow-x: visible;
+  }
+  .edit fieldset label {
+    width: max-content;
+    padding-right: 5px;
+  }
+  .edit-buttons {
+    justify-content: space-around;
+  }
+  .edit button,
+  .edit input {
+    font-size: 18px;
+  }
+  .edit button {
+    background-color: #f0e4b0;
+    border-radius: 20%;
+    text-align: center;
+    box-shadow: 0 2px 2px 0;
+    cursor: pointer;
   }
 }
