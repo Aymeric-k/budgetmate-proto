@@ -10,14 +10,16 @@ const soldeMontant = document.querySelector('#soldeMontant')
 const dateInput = document.querySelector('#datePicker')
 const monPortefeuille = new BudgetManager()
 
-function saveTransactionsToLocalStorage() {
-  localStorage.setItem('transactions', JSON.stringify(monPortefeuille.transactions))
-}
+// --- État de l'application ---
+let dateAffichee = new Date() // La "source de vérité" pour le mois affiché
 
-let listEntryLength = listEntry.children.length
-let listSpendingLength = listSpending.children.length
+monPortefeuille.chargerTransactions()
+updateUI()
 
 function createFormInput(index, type, element) {
+  // On rend la fonction plus intelligente : si un formulaire existe déjà, on ne fait rien.
+  if (element.querySelector('form')) return
+
   const formId = `form-${type}-${index}`
   element.innerHTML += `
     <form id="${formId}" action="" method="">
@@ -67,7 +69,6 @@ function createFormInput(index, type, element) {
   const button = currentForm.querySelector('button')
 
   button.addEventListener('click', () => {
-    console.log('test')
     const nom = currentForm.querySelector(`[id^=nom]`).value.trim()
     const montant = Number(currentForm.querySelector(`[id^=montant]`).value)
     const date = currentForm.querySelector(`[id^=dateAction]`).value
@@ -83,46 +84,86 @@ function createFormInput(index, type, element) {
     transaction.statut = statut
 
     monPortefeuille.ajouterTransaction(transaction)
-    updateGriffonColonne(type, montant, date)
 
-    const entreeTransactions = monPortefeuille.filtrerParType('entree')
-    const depenseTransactions = monPortefeuille.filtrerParType('depense')
-    afficherTransactions(entreeTransactions, listEntry)
-    afficherTransactions(depenseTransactions, listSpending)
-    const soldeDisponible = monPortefeuille.calculerSoldeALaDate(new Date())
-    const formattedDate = new Date().toLocaleDateString('fr-FR')
-    const ligneTotale = document.querySelector('#ligne-totale')
-    soldeMontant.textContent = `${soldeDisponible} € (Au ${formattedDate})`
-    ligneTotale.textContent = `Solde : ${soldeDisponible} € (Au ${formattedDate})`
     updateUI()
   })
 }
-createFormInput(listEntryLength, 'entree', listEntry)
 
 addE.addEventListener('click', () => {
-  createFormInput(listEntryLength, 'entree', listEntry)
+  // On utilise la longueur actuelle pour un index unique, même si ce n'est plus critique
+  const listEntryLength = listEntry.children.length
+  createFormInput(listEntryLength, 'entree', listEntry) // La fonction vérifiera si un form existe déjà
 })
 addS.addEventListener('click', () => {
+  const listSpendingLength = listSpending.children.length
   createFormInput(listSpendingLength, 'depense', listSpending)
 })
 
 function updateUI() {
-  const entreeTransactions = monPortefeuille.filtrerParType('entree')
-  const depenseTransactions = monPortefeuille.filtrerParType('depense')
-  afficherTransactions(entreeTransactions, listEntry)
-  afficherTransactions(depenseTransactions, listSpending)
+  // On utilise la date de l'état pour filtrer
+  const transactionsDuMois = monPortefeuille.filtrerParDate(dateAffichee)
+  const entreeTransactions = transactionsDuMois.filter((t) => t.type === 'entree')
+  const depenseTransactions = transactionsDuMois.filter((t) => t.type === 'depense')
+
+  const colEntrees = document.querySelector('#col-entrees')
+  const colDepenses = document.querySelector('#col-depenses')
+  if (colDepenses && colEntrees) {
+    document.querySelectorAll('.ligne-griffon').forEach((ligne) => {
+      ligne.remove()
+    })
+    monPortefeuille.transactions.forEach((transaction) => {
+      updateGriffonColonne(transaction.type, transaction.montant, transaction.getDateFormatee())
+    })
+  }
+
+  afficherTransactions(entreeTransactions, listEntry, transactionsDuMois)
+  afficherTransactions(depenseTransactions, listSpending, transactionsDuMois)
+
+  // Logique pour afficher le formulaire si une liste est vide
+  if (entreeTransactions.length === 0) {
+    createFormInput(0, 'entree', listEntry)
+  }
+  if (depenseTransactions.length === 0) {
+    createFormInput(0, 'depense', listSpending)
+  }
 
   const soldeDisponible = monPortefeuille.calculerSoldeALaDate(new Date())
   const formattedDate = new Date().toLocaleDateString('fr-FR')
   const ligneTotale = document.querySelector('#ligne-totale')
   soldeMontant.textContent = `${soldeDisponible} € (Au ${formattedDate})`
   ligneTotale.textContent = `Solde : ${soldeDisponible} € (Au ${formattedDate})`
+
+  // --- Logique pour le bilan mensuel dans la totalBox ---
+  const totalBox = document.querySelector('#totalBox')
+  if (totalBox) {
+    let bilanElement = totalBox.querySelector('#monthly-balance')
+    if (!bilanElement) {
+      bilanElement = document.createElement('span')
+      bilanElement.id = 'monthly-balance'
+      totalBox.appendChild(bilanElement)
+    }
+
+    const totalEntrees = entreeTransactions.reduce((acc, t) => acc + t.montant, 0)
+    const totalDepenses = depenseTransactions.reduce((acc, t) => acc + t.montant, 0)
+    const bilan = totalEntrees - totalDepenses
+    const bilanClass = bilan >= 0 ? 'bilan-positif' : 'bilan-negatif'
+    const moisNom = dateAffichee.toLocaleDateString('fr-FR', { month: 'long' })
+
+    bilanElement.innerHTML = `
+      Bilan ${moisNom}: <span class="${bilanClass}">${bilan.toFixed(2)} €</span>
+    `
+  }
 }
 
-function afficherTransactions(transactions, containerElement) {
+function afficherTransactions(transactions, containerElement, transactionsDuMois) {
   containerElement.innerHTML = ''
+  // Logique pour afficher le formulaire si une liste est vide
+  if (transactions.length === 0) {
+    const type = containerElement.id === 'listEntry' ? 'entree' : 'depense'
+    createFormInput(transactionsDuMois.length, type, containerElement)
+  }
   const fragment = document.createDocumentFragment()
-  transactions.forEach((transaction, index) => {
+  transactions.forEach((transaction) => {
     const postItDiv = document.createElement('div')
     const postItClass = transaction.type === 'entree' ? 'entree' : 'depense'
     postItDiv.className = `post-it ${postItClass}`
@@ -214,7 +255,7 @@ function handleListClick(e) {
       const nom = parentElement.querySelector(`#nom-${index}`).value.trim()
       const montant = Number(parentElement.querySelector(`#montant-${index}`).value)
       const date = parentElement.querySelector(`#dateAction-${index}`).value
-      const recurrence = parentElement.querySelector(`#recurrence-${index}`)
+      const recurrence = parentElement.querySelector(`#recurrence-${index}`).checked
       const datePourMAJ = new Date(date)
 
       const nouvellesDonnes = {
@@ -253,7 +294,7 @@ function updateGriffonColonne(type, montant, date) {
   ligne.className = 'ligne-griffon'
   ligne.innerHTML = `<p>${
     type === 'entree' ? '+ ' : '- '
-  }${montant} € <span id ="griffon-date">(${date})</span></p>`
+  }${montant} € <span class="griffon-date">(${date})</span></p>`
   document.querySelector(`#col-${type === 'entree' ? 'entrees' : 'depenses'}`).appendChild(ligne)
 }
 
@@ -282,11 +323,16 @@ toggleBtn.addEventListener('click', () => {
 })
 
 dateInput.addEventListener('change', () => {
-  const selectedDate = dateInput.value
+  const selectedDateString = dateInput.value
   const ligneTotale = document.querySelector('#ligne-totale')
 
   // Si la date est effacée, on revient au solde du jour
-  if (!selectedDate) {
+  if (!selectedDateString) {
+    // On met à jour l'état et on redessine la vue
+    dateAffichee = new Date()
+    updateUI()
+
+    // On met à jour le solde
     const soldeActuel = monPortefeuille.calculerSoldeALaDate(new Date())
     soldeMontant.textContent = `${soldeActuel} €`
     if (ligneTotale) {
@@ -294,10 +340,14 @@ dateInput.addEventListener('change', () => {
     }
     return
   }
+  // --- Logique de mise à jour de la vue ---
+  dateAffichee = new Date(selectedDateString)
+  updateUI()
 
-  const soldeALaDate = monPortefeuille.calculerSoldeALaDate(selectedDate)
+  // --- Votre logique de mise à jour du solde (conservée intacte) ---
+  const soldeALaDate = monPortefeuille.calculerSoldeALaDate(selectedDateString)
   const today = new Date()
-  const selectedDateObj = new Date(selectedDate)
+  const selectedDateObj = new Date(selectedDateString)
   today.setHours(0, 0, 0, 0)
   selectedDateObj.setHours(0, 0, 0, 0)
 

@@ -294,7 +294,7 @@ section input::placeholder {
 #totalBox {
   position: sticky;
   top: 0;
-  width: 250px;
+  width: max-content;
   background-color: #f0e4b0;
   border: 2px solid black;
   padding: 0.6rem 1.2rem;
@@ -308,6 +308,7 @@ section input::placeholder {
   gap: 0.8rem;
   z-index: 20;
   flex-shrink: 1;
+  white-space: nowrap;
 }
 .btn-container {
   display: flex;
@@ -323,6 +324,7 @@ section input::placeholder {
   height: 20px;
   cursor: pointer;
 }
+
 @media screen and (max-width: 899px) {
   main {
     flex-direction: column;
@@ -331,7 +333,7 @@ section input::placeholder {
   }
   #totalBox {
     width: 100%;
-    position: sticky;
+    position: fixed;
     bottom: 0;
     top: auto;
     border-radius: 0;
@@ -364,7 +366,9 @@ section input::placeholder {
     pointer-events: none;
     background-color: rgba(0, 0, 0, 0.85);
   }
-
+  #griffonSnippet p {
+    margin: 0;
+  }
   #griffonSnippet.open {
     height: 50vh;
     color: white;
@@ -402,7 +406,7 @@ section input::placeholder {
     display: block;
     position: absolute;
   }
-  #griffon-date {
+  .griffon-date {
     font-size: 12px;
   }
   .edit input {
@@ -431,4 +435,17 @@ section input::placeholder {
     box-shadow: 0 2px 2px 0;
     cursor: pointer;
   }
+}
+.bilan-positif {
+  color: #2a7e2a;
+  font-weight: bold;
+}
+.bilan-negatif {
+  color: #c31e1e;
+  font-weight: bold;
+}
+#monthly-balance {
+  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  padding-left: 0.8rem;
+  margin-left: 0.8rem;
 }
