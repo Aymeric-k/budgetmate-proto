@@ -10,14 +10,13 @@ const soldeMontant = document.querySelector('#soldeMontant')
 const dateInput = document.querySelector('#datePicker')
 const monPortefeuille = new BudgetManager()
 
-// --- État de l'application ---
-let dateAffichee = new Date() // La "source de vérité" pour le mois affiché
+let dateAffichee = new Date()
 
 monPortefeuille.chargerTransactions()
+
 updateUI()
 
 function createFormInput(index, type, element) {
-  // On rend la fonction plus intelligente : si un formulaire existe déjà, on ne fait rien.
   if (element.querySelector('form')) return
 
   const formId = `form-${type}-${index}`
@@ -80,19 +79,30 @@ function createFormInput(index, type, element) {
 
     const statut = getStatutFromDate(date)
 
-    const transaction = new Transaction(nom, montant, type, date)
-    transaction.statut = statut
+    let recurrenceData = null
+    if (currentForm.querySelector(`[id^=frequence]`)) {
+      recurrenceData = currentForm.querySelector(`[id^=frequence]`).value
+    }
 
+    // On ajoute 'T00:00:00' pour forcer l'interprétation de la date
+    // comme étant à minuit dans le fuseau horaire LOCAL de l'utilisateur,
+    // et non en UTC. C'est la clé pour éviter les bugs de fuseau horaire.
+    const transaction = new Transaction(
+      nom,
+      montant,
+      type,
+      new Date(date + 'T00:00:00'),
+      statut,
+      recurrenceData
+    )
     monPortefeuille.ajouterTransaction(transaction)
-
     updateUI()
   })
 }
 
 addE.addEventListener('click', () => {
-  // On utilise la longueur actuelle pour un index unique, même si ce n'est plus critique
   const listEntryLength = listEntry.children.length
-  createFormInput(listEntryLength, 'entree', listEntry) // La fonction vérifiera si un form existe déjà
+  createFormInput(listEntryLength, 'entree', listEntry)
 })
 addS.addEventListener('click', () => {
   const listSpendingLength = listSpending.children.length
@@ -100,7 +110,6 @@ addS.addEventListener('click', () => {
 })
 
 function updateUI() {
-  // On utilise la date de l'état pour filtrer
   const transactionsDuMois = monPortefeuille.filtrerParDate(dateAffichee)
   const entreeTransactions = transactionsDuMois.filter((t) => t.type === 'entree')
   const depenseTransactions = transactionsDuMois.filter((t) => t.type === 'depense')
@@ -111,7 +120,7 @@ function updateUI() {
     document.querySelectorAll('.ligne-griffon').forEach((ligne) => {
       ligne.remove()
     })
-    monPortefeuille.transactions.forEach((transaction) => {
+    transactionsDuMois.forEach((transaction) => {
       updateGriffonColonne(transaction.type, transaction.montant, transaction.getDateFormatee())
     })
   }
@@ -119,7 +128,6 @@ function updateUI() {
   afficherTransactions(entreeTransactions, listEntry, transactionsDuMois)
   afficherTransactions(depenseTransactions, listSpending, transactionsDuMois)
 
-  // Logique pour afficher le formulaire si une liste est vide
   if (entreeTransactions.length === 0) {
     createFormInput(0, 'entree', listEntry)
   }
@@ -133,7 +141,6 @@ function updateUI() {
   soldeMontant.textContent = `${soldeDisponible} € (Au ${formattedDate})`
   ligneTotale.textContent = `Solde : ${soldeDisponible} € (Au ${formattedDate})`
 
-  // --- Logique pour le bilan mensuel dans la totalBox ---
   const totalBox = document.querySelector('#totalBox')
   if (totalBox) {
     let bilanElement = totalBox.querySelector('#monthly-balance')
@@ -157,7 +164,6 @@ function updateUI() {
 
 function afficherTransactions(transactions, containerElement, transactionsDuMois) {
   containerElement.innerHTML = ''
-  // Logique pour afficher le formulaire si une liste est vide
   if (transactions.length === 0) {
     const type = containerElement.id === 'listEntry' ? 'entree' : 'depense'
     createFormInput(transactionsDuMois.length, type, containerElement)
@@ -170,19 +176,28 @@ function afficherTransactions(transactions, containerElement, transactionsDuMois
     const btnContainer = document.createElement('div')
     btnContainer.className = 'btn-container'
     postItDiv.appendChild(btnContainer)
-    const globalIndex = monPortefeuille.transactions.indexOf(transaction)
-    const editBtn = document.createElement('button')
-    editBtn.className = 'edit-btn post-it-btn'
-    editBtn.textContent = '✏️'
-    editBtn.dataset.index = globalIndex
-    btnContainer.appendChild(editBtn)
 
-    const deleteBtn = document.createElement('button')
-    deleteBtn.className = 'delete-btn post-it-btn'
-    deleteBtn.textContent = '🗑️'
-    deleteBtn.dataset.index = globalIndex
-    btnContainer.appendChild(deleteBtn)
-    const proprietesACacher = ['recurrence']
+    if (transaction.isGenerated) {
+      const recurIcon = document.createElement('span')
+      recurIcon.className = 'recur-icon'
+      recurIcon.textContent = '🔄'
+      btnContainer.appendChild(recurIcon)
+    } else {
+      const globalIndex = monPortefeuille.transactions.indexOf(transaction)
+      const editBtn = document.createElement('button')
+      editBtn.className = 'edit-btn post-it-btn'
+      editBtn.textContent = '✏️'
+      editBtn.dataset.index = globalIndex
+      btnContainer.appendChild(editBtn)
+
+      const deleteBtn = document.createElement('button')
+      deleteBtn.className = 'delete-btn post-it-btn'
+      deleteBtn.textContent = '🗑️'
+      deleteBtn.dataset.index = globalIndex
+      btnContainer.appendChild(deleteBtn)
+    }
+
+    const proprietesACacher = ['recurrence', 'dateDeFin', 'isGenerated']
 
     Object.keys(transaction).forEach((key) => {
       if (!proprietesACacher.includes(key)) {
@@ -236,9 +251,9 @@ function handleListClick(e) {
       <input type="date" name="dateAction" id="dateAction-${index}" value = "${inputDateValue}">
       <fieldset>
       <label for="recurrence">Récurrent ?</label>
-      <input type="checkbox" id="recurrence-${index}" name="recurrence" value="${
-      transaction.recurrence
-    }">
+      <input type="checkbox" id="recurrence-${index}" name="recurrence" ${
+      transaction.recurrence ? 'checked' : ''
+    }>
     </fieldset>
       <fieldset id="frequenceContainer-${index}"></fieldset>
       <fieldset class="edit-buttons">
@@ -246,6 +261,37 @@ function handleListClick(e) {
         <button type="button" class="save-btn">✔️</button>
       </fieldset>
     `
+    const recurrenceCheckbox = parentElement.querySelector(`#recurrence-${index}`)
+    const frequenceContainer = parentElement.querySelector(`#frequenceContainer-${index}`)
+
+    // Fonction pour afficher/cacher le sélecteur de fréquence
+    const toggleFrequenceSelector = () => {
+      if (recurrenceCheckbox.checked) {
+        const currentFrequence = transaction.recurrence ? transaction.recurrence : 'mensuel'
+        frequenceContainer.innerHTML = `
+          <label for="frequence-${index}">Fréquence</label>
+          <select name="frequence" id="frequence-${index}">
+            <option value="mensuel" ${
+              currentFrequence === 'mensuel' ? 'selected' : ''
+            }>Chaque mois</option>
+            <option value="hebdo" ${
+              currentFrequence === 'hebdo' ? 'selected' : ''
+            }>Chaque semaine</option>
+            <option value="annuel" ${
+              currentFrequence === 'annuel' ? 'selected' : ''
+            }>Chaque année</option>
+          </select>
+        `
+      } else {
+        frequenceContainer.innerHTML = ''
+      }
+    }
+
+    // On l'appelle une première fois pour initialiser l'état du formulaire
+    toggleFrequenceSelector()
+    // Et on ajoute un écouteur pour les changements futurs
+    recurrenceCheckbox.addEventListener('change', toggleFrequenceSelector)
+
     const cancelBtn = parentElement.querySelector('.cancel-btn')
     cancelBtn.addEventListener('click', () => {
       updateUI()
@@ -255,14 +301,20 @@ function handleListClick(e) {
       const nom = parentElement.querySelector(`#nom-${index}`).value.trim()
       const montant = Number(parentElement.querySelector(`#montant-${index}`).value)
       const date = parentElement.querySelector(`#dateAction-${index}`).value
-      const recurrence = parentElement.querySelector(`#recurrence-${index}`).checked
+      const isRecurrent = parentElement.querySelector(`#recurrence-${index}`).checked
       const datePourMAJ = new Date(date)
+
+      let recurrenceData = null
+      if (isRecurrent) {
+        recurrenceData = parentElement.querySelector(`#frequence-${index}`).value
+      }
 
       const nouvellesDonnes = {
         nom: nom,
         montant: montant,
         date: datePourMAJ,
-        recurrence: recurrence,
+        recurrence: recurrenceData,
+        statut: getStatutFromDate(date),
       }
       monPortefeuille.modifierTransaction(index, nouvellesDonnes)
       updateUI()
@@ -326,7 +378,6 @@ dateInput.addEventListener('change', () => {
   const selectedDateString = dateInput.value
   const ligneTotale = document.querySelector('#ligne-totale')
 
-  // Si la date est effacée, on revient au solde du jour
   if (!selectedDateString) {
     // On met à jour l'état et on redessine la vue
     dateAffichee = new Date()
@@ -341,7 +392,10 @@ dateInput.addEventListener('change', () => {
     return
   }
   // --- Logique de mise à jour de la vue ---
-  dateAffichee = new Date(selectedDateString)
+  // On applique la même logique ici pour que la date sélectionnée
+  // soit aussi interprétée comme minuit en heure locale.
+  dateAffichee = new Date(selectedDateString + 'T00:00:00')
+
   updateUI()
 
   // --- Votre logique de mise à jour du solde (conservée intacte) ---
