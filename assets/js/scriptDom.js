@@ -8,6 +8,10 @@ const listEntry = document.querySelector('#listEntry')
 const listSpending = document.querySelector('#listSpending')
 const soldeMontant = document.querySelector('#soldeMontant')
 const dateInput = document.querySelector('#datePicker')
+const prevMonthBtn = document.querySelector('#prevMonthBtn')
+const nextMonthBtn = document.querySelector('#nextMonthBtn')
+const monthTitle = document.querySelector('#month-title')
+
 const monPortefeuille = new BudgetManager()
 
 let dateAffichee = new Date()
@@ -110,6 +114,15 @@ addS.addEventListener('click', () => {
 })
 
 function updateUI() {
+  // Mettre à jour le titre du mois
+  const moisAnnee = dateAffichee.toLocaleDateString('fr-FR', {
+    month: 'long',
+    year: 'numeric',
+  })
+  if (monthTitle) {
+    monthTitle.textContent = moisAnnee.charAt(0).toUpperCase() + moisAnnee.slice(1)
+  }
+
   const transactionsDuMois = monPortefeuille.filtrerParDate(dateAffichee)
   const entreeTransactions = transactionsDuMois.filter((t) => t.type === 'entree')
   const depenseTransactions = transactionsDuMois.filter((t) => t.type === 'depense')
@@ -179,9 +192,17 @@ function afficherTransactions(transactions, containerElement, transactionsDuMois
 
     if (transaction.isGenerated) {
       const recurIcon = document.createElement('span')
-      recurIcon.className = 'recur-icon'
+      recurIcon.className = 'recur-icon post-it-btn'
       recurIcon.textContent = '🔄'
       btnContainer.appendChild(recurIcon)
+
+      // On ajoute un bouton d'édition pour les instances
+      const editBtn = document.createElement('button')
+      editBtn.className = 'edit-btn post-it-btn'
+      editBtn.textContent = '✏️'
+      editBtn.dataset.index = transaction.originalRuleIndex // Index de la règle d'origine
+      editBtn.dataset.instanceDate = transaction.date.toISOString() // Date de cette instance spécifique
+      btnContainer.appendChild(editBtn)
     } else {
       const globalIndex = monPortefeuille.transactions.indexOf(transaction)
       const editBtn = document.createElement('button')
@@ -197,7 +218,7 @@ function afficherTransactions(transactions, containerElement, transactionsDuMois
       btnContainer.appendChild(deleteBtn)
     }
 
-    const proprietesACacher = ['recurrence', 'dateDeFin', 'isGenerated']
+    const proprietesACacher = ['recurrence', 'dateDeFin', 'isGenerated', 'originalRuleIndex']
 
     Object.keys(transaction).forEach((key) => {
       if (!proprietesACacher.includes(key)) {
@@ -235,10 +256,14 @@ function handleListClick(e) {
   } else if (e.target.classList.contains('edit-btn')) {
     const parentElement = e.target.closest('.post-it')
     const index = e.target.dataset.index
-    const transaction = monPortefeuille.transactions[index]
-    const inputDateValue = formatDateForInput(transaction.date)
+    const instanceDateStr = e.target.dataset.instanceDate
 
-    // parentElement.classList.remove('post-it', transaction.type)
+    const transaction = monPortefeuille.transactions[index]
+
+    // On utilise la date de l'instance pour le formulaire si elle existe, sinon la date de la transaction de base.
+    const dateForForm = instanceDateStr ? new Date(instanceDateStr) : transaction.date
+    const inputDateValue = formatDateForInput(dateForForm)
+
     parentElement.classList.add('edit')
     parentElement.innerHTML = `
 
@@ -302,7 +327,9 @@ function handleListClick(e) {
       const montant = Number(parentElement.querySelector(`#montant-${index}`).value)
       const date = parentElement.querySelector(`#dateAction-${index}`).value
       const isRecurrent = parentElement.querySelector(`#recurrence-${index}`).checked
-      const datePourMAJ = new Date(date)
+      // On s'assure que la date est interprétée en fuseau horaire local
+      // pour être cohérent avec la création de transaction.
+      const datePourMAJ = new Date(date + 'T00:00:00')
 
       let recurrenceData = null
       if (isRecurrent) {
@@ -372,6 +399,16 @@ toggleBtn.addEventListener('click', () => {
     document.body.style.overflow = 'hidden'
     document.documentElement.style.overflow = 'hidden'
   }
+})
+
+prevMonthBtn.addEventListener('click', () => {
+  dateAffichee.setMonth(dateAffichee.getMonth() - 1)
+  updateUI()
+})
+
+nextMonthBtn.addEventListener('click', () => {
+  dateAffichee.setMonth(dateAffichee.getMonth() + 1)
+  updateUI()
 })
 
 dateInput.addEventListener('change', () => {

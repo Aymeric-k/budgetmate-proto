@@ -13,9 +13,6 @@ h2 {
   font-family: 'Patrick Hand', cursive;
 }
 
-#titreEntree {
-  left: 25%;
-}
 header {
   display: flex;
   justify-content: space-between;
@@ -52,9 +49,6 @@ header li {
 h1 {
   padding-left: 2%;
 }
-h2 {
-  width: 40%;
-}
 h3 {
   text-align: center;
 }
@@ -87,6 +81,29 @@ main {
   align-items: center;
   gap: 1em;
   flex-shrink: 0;
+}
+.month-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+#month-title {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 2.5rem;
+  text-align: center;
+  margin: 0;
+  min-width: 250px;
+}
+.month-nav-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
 }
 fieldset {
   border: none;

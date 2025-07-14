@@ -146,6 +146,7 @@ class BudgetManager {
             regle.dateDeFin
           )
           instance.isGenerated = true
+          instance.originalRuleIndex = this.transactions.indexOf(regle)
           transactionsAffichees.push(instance)
         }
       }

@@ -42,12 +42,17 @@
         <div id="ligne-totale"><p>Total : 0 €</p></div>
       </div>
       <section id="transactions">
-        <h2 id="titreEntree">Entrées :</h2>
+        <div class="month-header">
+          <button id="prevMonthBtn" class="month-nav-btn" title="Mois précédent">⬅️</button>
+          <h2 id="month-title"></h2>
+          <button id="nextMonthBtn" class="month-nav-btn" title="Mois suivant">➡️</button>
+        </div>
+        <h3 id="titreEntree">Entrées :</h3>
         <div id="listEntry"></div>
         <form action=""></form>
         <button id="addE" class="add">Ajouter une entrée d'argent</button>
 
-        <h2>Dépenses :</h2>
+        <h3>Dépenses :</h3>
         <div id="listSpending"></div>
         <button id="addS" class="add">Ajouter une dépense d'argent</button>
       </section>
