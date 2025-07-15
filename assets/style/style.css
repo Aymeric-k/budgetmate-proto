@@ -86,7 +86,6 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
   width: 100%;
   margin-bottom: 1rem;
 }
@@ -95,14 +94,14 @@ main {
   font-size: 2.5rem;
   text-align: center;
   margin: 0;
-  min-width: 250px;
+  min-width: 190px;
 }
 .month-nav-btn {
   background: none;
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.5rem 0;
   border-radius: 50%;
 }
 fieldset {
