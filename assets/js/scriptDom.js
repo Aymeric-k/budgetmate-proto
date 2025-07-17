@@ -100,8 +100,35 @@ function createFormInput(index, type, element) {
       recurrenceData
     )
     monPortefeuille.ajouterTransaction(transaction)
+    const message =
+      type === 'entree' ? 'Entrée ajoutée avec succès !' : 'Dépense ajoutée avec succès !'
+    showNotification(message, type) // On passe 'entree' ou 'depense' pour le style
     updateUI()
   })
+}
+function showNotification(message, type) {
+  // 1. On cible le bon conteneur (attention à la faute de frappe "notifaction")
+  const notificationContainer = document.querySelector('#notification-container')
+  if (!notificationContainer) {
+    console.error("Le conteneur de notifications #notification-container n'a pas été trouvé.")
+    return
+  }
+
+  // 2. On crée la notification et on lui donne ses classes
+  const notification = document.createElement('div')
+  notification.classList.add('notification', type) // ex: 'notification entree'
+  notification.textContent = message
+  notificationContainer.appendChild(notification)
+
+  // 3. On ajoute la classe 'show' pour la faire apparaître (après un court délai pour que la transition se déclenche)
+  setTimeout(() => notification.classList.add('show'), 10)
+
+  // 4. On planifie sa disparition
+  setTimeout(() => {
+    notification.classList.remove('show')
+    // 5. On la supprime du DOM une fois l'animation de sortie terminée
+    notification.addEventListener('transitionend', () => notification.remove())
+  }, 4000) // La notification reste visible 4 secondes
 }
 
 addE.addEventListener('click', () => {
@@ -401,16 +428,14 @@ toggleBtn.addEventListener('click', () => {
   }
 })
 
-prevMonthBtn.addEventListener('click', () => {
-  dateAffichee.setMonth(dateAffichee.getMonth() - 1)
-  updateUI()
+dateInput.addEventListener('click', (e) => {
+  try {
+    console.log('test')
+    e.target.showPicker()
+  } catch (error) {
+    console.log('date.showPicker() not supported.')
+  }
 })
-
-nextMonthBtn.addEventListener('click', () => {
-  dateAffichee.setMonth(dateAffichee.getMonth() + 1)
-  updateUI()
-})
-
 dateInput.addEventListener('change', () => {
   const selectedDateString = dateInput.value
   const ligneTotale = document.querySelector('#ligne-totale')
@@ -449,5 +474,19 @@ dateInput.addEventListener('change', () => {
   } else {
     soldeMontant.textContent = `${soldeALaDate} €`
     ligneTotale.textContent = `Solde : ${soldeALaDate} €`
+  }
+})
+
+prevMonthBtn.addEventListener('click', () => {
+  dateAffichee.setMonth(dateAffichee.getMonth() - 1)
+  updateUI()
+})
+nextMonthBtn.addEventListener('click', () => {
+  dateAffichee.setMonth(dateAffichee.getMonth() + 1)
+  updateUI()
+})
+document.addEventListener('click', (e) => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'date') {
+    e.target.showPicker()
   }
 })

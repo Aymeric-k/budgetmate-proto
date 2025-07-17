@@ -4,6 +4,7 @@ body {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
   margin: 0;
 }
+
 fieldset {
   overflow-x: hidden;
 }
@@ -20,6 +21,7 @@ header {
   width: 100%;
   height: 10vh;
 }
+
 header a {
   font-size: large;
   text-decoration: none;
@@ -28,14 +30,17 @@ header a {
   display: flex;
   width: 100%;
 }
+
 header a:hover {
   border: 1px solid black;
   border-radius: 10px;
 }
+
 nav {
   display: flex;
   flex: 0 1 300px;
 }
+
 ul {
   display: flex;
   width: 100%;
@@ -43,12 +48,15 @@ ul {
   justify-content: space-around;
   gap: 1%;
 }
+
 header li {
   padding: 1%;
 }
+
 h1 {
   padding-left: 2%;
 }
+
 h3 {
   text-align: center;
 }
@@ -59,6 +67,7 @@ main,
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-repeat: repeat;
 }
+
 main {
   height: 100%;
   width: 100%;
@@ -82,31 +91,37 @@ main {
   gap: 1em;
   flex-shrink: 0;
 }
+
 .month-header {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
   width: 100%;
   margin-bottom: 1rem;
 }
+
 #month-title {
   font-family: 'Patrick Hand', cursive;
   font-size: 2.5rem;
   text-align: center;
   margin: 0;
-  min-width: 190px;
+  min-width: 250px;
 }
+
 .month-nav-btn {
   background: none;
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   border-radius: 50%;
 }
+
 fieldset {
   border: none;
 }
+
 input,
 textarea,
 button,
@@ -126,17 +141,20 @@ section input {
   border: 2px solid black;
   text-align: center;
 }
+
 .add,
 #toggleSnippet {
   background-color: #f0e4b0;
   border: 2px black double;
 }
+
 .add {
   border-radius: 1em;
   box-shadow: 2px 2px 0px black;
   transition: transform 0.1s ease;
   width: 60%;
 }
+
 .add:hover {
   transform: scale(1.11);
 }
@@ -146,6 +164,7 @@ fieldset {
   width: 95%;
   display: flex;
 }
+
 form {
   flex-direction: column;
   align-items: center;
@@ -156,6 +175,7 @@ fieldset {
   justify-content: center;
   align-items: center;
 }
+
 fieldset label {
   font-size: 20px;
   font-weight: 800;
@@ -173,6 +193,7 @@ section input::placeholder {
     font-size: 1.5em;
   }
 }
+
 #listEntry,
 #listSpending {
   display: flex;
@@ -181,9 +202,11 @@ section input::placeholder {
   gap: 1rem;
   width: 100%;
 }
+
 .bold {
   font-weight: 600;
 }
+
 #listEntry p,
 #listSpending p {
   font-size: 22px;
@@ -192,11 +215,13 @@ section input::placeholder {
   align-items: center;
   gap: 10px;
 }
+
 .add::after {
   content: '✎';
   margin-left: 10px;
   opacity: 0.5;
 }
+
 .post-it {
   width: 250px;
   height: 250px;
@@ -224,10 +249,12 @@ section input::placeholder {
   border: 3px dashed;
   pointer-events: none;
 }
+
 .post-it p {
   justify-content: center;
   margin: 8px 0;
 }
+
 .entree::before {
   border-color: green;
 }
@@ -235,6 +262,7 @@ section input::placeholder {
 .depense::before {
   border-color: red;
 }
+
 #snippetZone {
   display: flex;
   justify-content: flex-start;
@@ -245,11 +273,18 @@ section input::placeholder {
   margin: 0;
   width: max-content;
 }
+
 #datePicker {
   background-color: transparent;
   border: none;
-  width: 6%;
+  border-radius: 5px;
+
+  cursor: pointer;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  width: 19px;
 }
+
 .griffon-col {
   display: flex;
   flex-direction: column;
@@ -258,10 +293,12 @@ section input::placeholder {
   font-size: 1.2rem;
   min-width: 150px;
 }
+
 .griffon-col:nth-child(2) {
   border-left: 2px solid #999;
   padding-left: 0.5rem;
 }
+
 .ligne-griffon {
   padding-left: 1rem;
 }
@@ -273,9 +310,11 @@ section input::placeholder {
   padding-left: 1rem;
   min-width: 250px;
 }
+
 #ligne-totale p {
   text-align: center;
 }
+
 #griffonSnippet {
   position: absolute;
   left: 1rem;
@@ -287,6 +326,7 @@ section input::placeholder {
   box-sizing: border-box;
   z-index: 2;
 }
+
 #toggleSnippet {
   position: fixed;
   bottom: 4rem;
@@ -306,6 +346,7 @@ section input::placeholder {
   width: 1.3rem;
   height: 1.3rem;
 }
+
 #totalBox {
   position: sticky;
   top: 0;
@@ -320,17 +361,19 @@ section input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.1rem;
+  gap: 0.8rem;
   z-index: 20;
   flex-shrink: 0;
   white-space: nowrap;
 }
+
 .btn-container {
   display: flex;
   justify-content: flex-end;
   gap: 0.8em;
   padding: 0 0.7em 0 0;
 }
+
 .post-it-btn {
   background-color: transparent;
   border: none;
@@ -345,6 +388,7 @@ section input::placeholder {
   main {
     overflow-x: hidden;
   }
+
   main {
     flex-direction: column;
     align-items: center;
@@ -356,9 +400,11 @@ section input::placeholder {
   header ul {
     padding: 0;
   }
+
   .month-header {
     gap: 0;
   }
+
   #totalBox {
     width: 100%;
     position: fixed;
@@ -369,22 +415,27 @@ section input::placeholder {
     border-bottom: none;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
     z-index: 100;
-    padding: 0.1rem;
+    padding: 0.5rem 0.8rem;
+    /* Plus d'espace */
     flex-wrap: wrap;
     white-space: normal;
     height: auto;
-    justify-content: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
+
   #totalBox button {
     background: none;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
   }
+
   .griffon-col {
     font-size: 30px;
     padding-right: 10px;
   }
+
   #griffonSnippet {
     position: fixed;
     top: 0;
@@ -399,9 +450,11 @@ section input::placeholder {
     pointer-events: none;
     background-color: rgba(0, 0, 0, 0.85);
   }
+
   #griffonSnippet p {
     margin: 0;
   }
+
   #griffonSnippet.open {
     height: 50vh;
     color: white;
@@ -419,32 +472,78 @@ section input::placeholder {
     opacity: 1;
     font-size: 30px;
   }
+
   #griffonSnippet.open.closing {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   #toggleSnippet {
     display: block;
   }
+
   #snippetZone {
     height: 100%;
   }
+
   #ligne-totale {
     font-size: larger;
     padding-left: 0;
   }
+
   #transactions {
     padding: 0 0 5em 0;
   }
 }
+
 @media screen and (min-width: 900px) {
+  #notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .notification {
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-family: sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(120%);
+    opacity: 0;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  }
+
+  /* Style pour les entrées */
+  .notification.entree {
+    background-color: #28a745;
+  }
+
+  /* Style pour les dépenses */
+  .notification.depense {
+    background-color: #dc3545;
+  }
+
+  /* État visible de la notification */
+  .notification.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
   #griffonSnippet {
     display: block;
     position: absolute;
   }
+
   .griffon-date {
     font-size: 12px;
   }
+
   #totalWrapper {
     width: 100%;
     position: sticky;
@@ -452,25 +551,31 @@ section input::placeholder {
     display: flex;
     justify-content: flex-end;
   }
+
   .edit input {
     padding: 0;
     margin: 0.5em 0;
   }
+
   .edit fieldset {
     padding: 0;
     overflow-x: visible;
   }
+
   .edit fieldset label {
     width: max-content;
     padding-right: 5px;
   }
+
   .edit-buttons {
     justify-content: space-around;
   }
+
   .edit button,
   .edit input {
     font-size: 18px;
   }
+
   .edit button {
     background-color: #f0e4b0;
     border-radius: 20%;
@@ -479,19 +584,23 @@ section input::placeholder {
     cursor: pointer;
   }
 }
+
 .bilan-positif {
   color: #2a7e2a;
   font-weight: bold;
 }
+
 .bilan-negatif {
   color: #c31e1e;
   font-weight: bold;
 }
+
 #monthly-balance {
   border-left: 2px solid rgba(0, 0, 0, 0.2);
   padding-left: 0.8rem;
   margin-left: 0.8rem;
 }
+
 .recur-icon {
   font-size: 26px;
 }
