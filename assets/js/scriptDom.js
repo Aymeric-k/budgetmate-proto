@@ -107,28 +107,24 @@ function createFormInput(index, type, element) {
   })
 }
 function showNotification(message, type) {
-  // 1. On cible le bon conteneur (attention à la faute de frappe "notifaction")
   const notificationContainer = document.querySelector('#notification-container')
   if (!notificationContainer) {
     console.error("Le conteneur de notifications #notification-container n'a pas été trouvé.")
     return
   }
 
-  // 2. On crée la notification et on lui donne ses classes
   const notification = document.createElement('div')
-  notification.classList.add('notification', type) // ex: 'notification entree'
+  notification.classList.add('notification', type) //
   notification.textContent = message
   notificationContainer.appendChild(notification)
 
-  // 3. On ajoute la classe 'show' pour la faire apparaître (après un court délai pour que la transition se déclenche)
   setTimeout(() => notification.classList.add('show'), 10)
 
-  // 4. On planifie sa disparition
   setTimeout(() => {
     notification.classList.remove('show')
-    // 5. On la supprime du DOM une fois l'animation de sortie terminée
+
     notification.addEventListener('transitionend', () => notification.remove())
-  }, 4000) // La notification reste visible 4 secondes
+  }, 4000)
 }
 
 addE.addEventListener('click', () => {
@@ -234,12 +230,14 @@ function afficherTransactions(transactions, containerElement, transactionsDuMois
       const globalIndex = monPortefeuille.transactions.indexOf(transaction)
       const editBtn = document.createElement('button')
       editBtn.className = 'edit-btn post-it-btn'
+      editBtn.setAttribute('aria-label', 'Modifier la transaction')
       editBtn.textContent = '✏️'
       editBtn.dataset.index = globalIndex
       btnContainer.appendChild(editBtn)
 
       const deleteBtn = document.createElement('button')
       deleteBtn.className = 'delete-btn post-it-btn'
+      deleteBtn.setAttribute('aria-label', 'Supprimer la transaction')
       deleteBtn.textContent = '🗑️'
       deleteBtn.dataset.index = globalIndex
       btnContainer.appendChild(deleteBtn)
