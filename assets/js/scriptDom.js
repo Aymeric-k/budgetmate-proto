@@ -1,6 +1,5 @@
 import { Transaction, BudgetManager } from './budget.js'
 
-const entrees = document.querySelector('#entrees')
 const addE = document.querySelector('#addE')
 const addS = document.querySelector('#addS')
 
@@ -20,77 +19,97 @@ monPortefeuille.chargerTransactions()
 
 updateUI()
 
-function createFormInput(index, type, element) {
-  if (element.querySelector('form')) return
+/**
+ * Affiche un formulaire pour ajouter une nouvelle transaction.
+ * @param {'entree' | 'depense'} type Le type de transaction à ajouter.
+ */
+function showTransactionForm(type) {
+  const isEntry = type === 'entree'
+  const container = isEntry ? listEntry : listSpending
+  const buttonToHide = isEntry ? addE : addS
 
-  const formId = `form-${type}-${index}`
-  element.innerHTML += `
-    <form id="${formId}" action="" method="">
-<fieldset>
-        <label for="nom">Nom de l'ajout</label>
-        <input type="text" name="nom" id="nom-${index}" placeholder="Optionnel" data-index="${
-    index - 1
-  }">
-      </fieldset>
-      <fieldset>
-        <label for="montant">Montant</label>
-        <input type="number" name="montant" id="montant-${index}" placeholder="Montant exact" data-index="${index}" data-type="${type}" class="transaction">
-      </fieldset>
-      <fieldset>
-        <label for="dateAction">Date</label>
-        <input type="date" name="dateAction" id="dateAction-${index}">
-      </fieldset>
-      <fieldset>
-        <label for="recurrence">Récurrent ?</label>
-        <input type="checkbox" id="recurrence-${index}" name="recurrence" value="non">
-      </fieldset>
-      <fieldset id="frequenceContainer-${index}"></fieldset>
-      <button type="button" class="add">Ajouter</button>
-    </form>
-    `
-  const recurrenceCheckbox = document.querySelector(`#recurrence-${index}`)
-  const frequenceContainer = document.querySelector(`#frequenceContainer-${index}`)
+  // Vérifie si un formulaire pour cette section est déjà ouvert.
+  if (
+    container.nextElementSibling &&
+    container.nextElementSibling.classList.contains('transaction-form')
+  ) {
+    console.warn(`Le formulaire pour '${type}' est déjà ouvert.`)
+    container.nextElementSibling.querySelector('input').focus() // Met le focus sur le formulaire existant
+    return
+  }
 
+  buttonToHide.style.display = 'none'
+
+  const form = document.createElement('form')
+  form.className = 'transaction-form'
+  form.noValidate = true
+
+  form.innerHTML = `
+    <fieldset>
+        <label for="nom-new">Nom de la transaction</label>
+        <input type="text" name="nom" id="nom-new" placeholder="Ex: Salaire, Courses..." required>
+    </fieldset>
+    <fieldset>
+        <label for="montant-new">Montant</label>
+        <input type="number" name="montant" id="montant-new" placeholder="Montant exact" required step="0.01">
+    </fieldset>
+    <fieldset>
+        <label for="dateAction-new">Date</label>
+        <input type="date" name="dateAction" id="dateAction-new" value="${formatDateForInput(
+          new Date()
+        )}" required>
+    </fieldset>
+    <fieldset>
+        <label for="recurrence-new">Récurrent ?</label>
+        <input type="checkbox" id="recurrence-new" name="recurrence">
+    </fieldset>
+    <fieldset id="frequenceContainer-new"></fieldset>
+    <div class="form-actions">
+        <button type="submit" class="add">Ajouter</button>
+        <button type="button" class="cancel-btn">Annuler</button>
+    </div>
+  `
+
+  const recurrenceCheckbox = form.querySelector(`#recurrence-new`)
+  const frequenceContainer = form.querySelector(`#frequenceContainer-new`)
   recurrenceCheckbox.addEventListener('change', (e) => {
     if (e.target.checked) {
       frequenceContainer.innerHTML = `
-        <fieldset>
-          <label for="frequence">Fréquence</label>
-          <select name="frequence" id="frequence-${index}">
-            <option value="quotidien">Tous les jours</option>
-            <option value="hebdo">Chaque semaine</option>
-            <option value="mensuel">Chaque mois</option>
-            <option value="annuel">Chaque année</option>
+          <label for="frequence-new">Fréquence</label>
+          <select name="frequence" id="frequence-new">
+              <option value="mensuel">Chaque mois</option>
+              <option value="hebdo">Chaque semaine</option>
+              <option value="annuel">Chaque année</option>
           </select>
-        </fieldset>
       `
     } else {
       frequenceContainer.innerHTML = ''
     }
   })
-  const currentForm = document.getElementById(formId)
-  const button = currentForm.querySelector('button')
 
-  button.addEventListener('click', () => {
-    const nom = currentForm.querySelector(`[id^=nom]`).value.trim()
-    const montant = Number(currentForm.querySelector(`[id^=montant]`).value)
-    const date = currentForm.querySelector(`[id^=dateAction]`).value
-    const type = currentForm.querySelector(`[id^=montant]`).dataset.type
+  const closeForm = () => {
+    form.remove()
+    buttonToHide.style.display = ''
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const nom = form.querySelector(`#nom-new`).value.trim()
+    const montant = Number(form.querySelector(`#montant-new`).value)
+    const date = form.querySelector(`#dateAction-new`).value
+
     if (!nom || !montant || !date) {
-      alert('Merci de remplir au minimum les champs nom, montant et date.')
+      showNotification('Merci de remplir les champs nom, montant et date.', 'error')
       return
     }
 
     const statut = getStatutFromDate(date)
-
     let recurrenceData = null
-    if (currentForm.querySelector(`[id^=frequence]`)) {
-      recurrenceData = currentForm.querySelector(`[id^=frequence]`).value
+    const frequenceSelect = form.querySelector(`#frequence-new`)
+    if (frequenceSelect) {
+      recurrenceData = frequenceSelect.value
     }
 
-    // On ajoute 'T00:00:00' pour forcer l'interprétation de la date
-    // comme étant à minuit dans le fuseau horaire LOCAL de l'utilisateur,
-    // et non en UTC. C'est la clé pour éviter les bugs de fuseau horaire.
     const transaction = new Transaction(
       nom,
       montant,
@@ -102,10 +121,21 @@ function createFormInput(index, type, element) {
     monPortefeuille.ajouterTransaction(transaction)
     const message =
       type === 'entree' ? 'Entrée ajoutée avec succès !' : 'Dépense ajoutée avec succès !'
-    showNotification(message, type) // On passe 'entree' ou 'depense' pour le style
-    updateUI()
+    showNotification(message, type)
+
+    closeForm() // On ferme le formulaire après l'ajout.
+    updateUI() // On met à jour l'interface.
   })
+
+  // Gestion de l'annulation.
+  const cancelButton = form.querySelector('.cancel-btn')
+  cancelButton.addEventListener('click', closeForm)
+
+  // On ajoute le formulaire au DOM, après la liste correspondante.
+  container.insertAdjacentElement('afterend', form)
+  form.querySelector('#nom-new').focus()
 }
+
 function showNotification(message, type) {
   const notificationContainer = document.querySelector('#notification-container')
   if (!notificationContainer) {
@@ -114,7 +144,7 @@ function showNotification(message, type) {
   }
 
   const notification = document.createElement('div')
-  notification.classList.add('notification', type) //
+  notification.classList.add('notification', type)
   notification.textContent = message
   notificationContainer.appendChild(notification)
 
@@ -127,14 +157,8 @@ function showNotification(message, type) {
   }, 4000)
 }
 
-addE.addEventListener('click', () => {
-  const listEntryLength = listEntry.children.length
-  createFormInput(listEntryLength, 'entree', listEntry)
-})
-addS.addEventListener('click', () => {
-  const listSpendingLength = listSpending.children.length
-  createFormInput(listSpendingLength, 'depense', listSpending)
-})
+addE.addEventListener('click', () => showTransactionForm('entree'))
+addS.addEventListener('click', () => showTransactionForm('depense'))
 
 function updateUI() {
   // Mettre à jour le titre du mois
@@ -163,13 +187,6 @@ function updateUI() {
 
   afficherTransactions(entreeTransactions, listEntry, transactionsDuMois)
   afficherTransactions(depenseTransactions, listSpending, transactionsDuMois)
-
-  if (entreeTransactions.length === 0) {
-    createFormInput(0, 'entree', listEntry)
-  }
-  if (depenseTransactions.length === 0) {
-    createFormInput(0, 'depense', listSpending)
-  }
 
   const soldeDisponible = monPortefeuille.calculerSoldeALaDate(new Date())
   const formattedDate = new Date().toLocaleDateString('fr-FR')
@@ -200,10 +217,6 @@ function updateUI() {
 
 function afficherTransactions(transactions, containerElement, transactionsDuMois) {
   containerElement.innerHTML = ''
-  if (transactions.length === 0) {
-    const type = containerElement.id === 'listEntry' ? 'entree' : 'depense'
-    createFormInput(transactionsDuMois.length, type, containerElement)
-  }
   const fragment = document.createDocumentFragment()
   transactions.forEach((transaction) => {
     const postItDiv = document.createElement('div')
@@ -352,8 +365,6 @@ function handleListClick(e) {
       const montant = Number(parentElement.querySelector(`#montant-${index}`).value)
       const date = parentElement.querySelector(`#dateAction-${index}`).value
       const isRecurrent = parentElement.querySelector(`#recurrence-${index}`).checked
-      // On s'assure que la date est interprétée en fuseau horaire local
-      // pour être cohérent avec la création de transaction.
       const datePourMAJ = new Date(date + 'T00:00:00')
 
       let recurrenceData = null
@@ -451,14 +462,11 @@ dateInput.addEventListener('change', () => {
     }
     return
   }
-  // --- Logique de mise à jour de la vue ---
-  // On applique la même logique ici pour que la date sélectionnée
-  // soit aussi interprétée comme minuit en heure locale.
+
   dateAffichee = new Date(selectedDateString + 'T00:00:00')
 
   updateUI()
 
-  // --- Votre logique de mise à jour du solde (conservée intacte) ---
   const soldeALaDate = monPortefeuille.calculerSoldeALaDate(selectedDateString)
   const today = new Date()
   const selectedDateObj = new Date(selectedDateString)
