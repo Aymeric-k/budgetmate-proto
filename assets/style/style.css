@@ -534,45 +534,48 @@ section input::placeholder {
   }
 }
 
+/* --- Notifications (Mobile First) --- */
+#notification-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  width: 90%;
+  max-width: 400px;
+}
+
+.notification {
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.2rem;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(-150%);
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.notification.entree {
+  background-color: #28a745;
+}
+
+.notification.depense {
+  background-color: #dc3545;
+}
+
+.notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
 @media screen and (min-width: 900px) {
-  #notification-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    pointer-events: none;
-  }
-
-  .notification {
-    padding: 15px 25px;
-    border-radius: 8px;
-    color: white;
-    font-family: sans-serif;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: translateY(120%);
-    opacity: 0;
-    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-  }
-
-  /* Style pour les entrées */
-  .notification.entree {
-    background-color: #28a745;
-  }
-
-  /* Style pour les dépenses */
-  .notification.depense {
-    background-color: #dc3545;
-  }
-
-  /* État visible de la notification */
-  .notification.show {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
   #griffonSnippet {
     display: block;
     position: absolute;
@@ -623,6 +626,16 @@ section input::placeholder {
   }
   #transactions h3 {
     font-size: 30px;
+  }
+
+  /* --- Notifications (Desktop Override) --- */
+  #notification-container {
+    top: auto;
+    bottom: 20px;
+    left: auto;
+    right: 20px;
+    transform: none;
+    width: auto;
   }
 }
 
